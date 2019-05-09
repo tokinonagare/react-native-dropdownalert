@@ -153,6 +153,7 @@ export default class DropdownAlert extends Component {
       duration: 450,
       type: '',
       message: '',
+      messageAction: '',
       title: '',
       isOpen: false,
       startDelta: props.startDelta,
@@ -208,7 +209,7 @@ export default class DropdownAlert extends Component {
       },
     });
   };
-  alertWithType = (type, title, message, payload, interval) => {
+  alertWithType = (type, title, message, payload, messageAction, interval) => {
     if (validateType(type) == false) {
       return;
     }
@@ -223,6 +224,7 @@ export default class DropdownAlert extends Component {
       this.setState({
         type: type,
         message: message,
+        messageAction: messageAction,
         title: title,
         topValue: 0,
         payload: payload,
@@ -257,6 +259,7 @@ export default class DropdownAlert extends Component {
             self.setState({
               type: type,
               message: message,
+              messageAction: messageAction,
               title: title,
               isOpen: true,
               topValue: 0,
@@ -497,7 +500,13 @@ export default class DropdownAlert extends Component {
         <Animated.View ref={ref => this.mainView = ref} {...this._panResponder.panHandlers} style={[wrapperStyle, this.props.wrapperStyle]}>
           <TouchableOpacity
             activeOpacity={!this.props.tapToCloseEnabled || showCancel ? 1 : 0.95}
-            onPress={!this.props.tapToCloseEnabled ? null : () => this.close('tap')}
+            onPress={!this.props.tapToCloseEnabled ? null : () => {
+                this.close('tap');
+                // 在调用时处理额外的点击事件
+                this.props.onPressDropDownAlert &&
+                this.props.onPressDropDownAlert(this.state.messageAction);
+              }
+            }
             disabled={!this.props.tapToCloseEnabled}
             onLayout={event => this.onLayoutEvent(event)}
             testID={this.props.testID}
